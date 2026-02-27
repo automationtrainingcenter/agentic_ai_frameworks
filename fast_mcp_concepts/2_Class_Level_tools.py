@@ -1,5 +1,6 @@
 from fastmcp import FastMCP
 from fastmcp.tools import tool
+import os
 
 
 class Calculator:
@@ -27,6 +28,11 @@ class Product:
             3: {"name": "Product 3", "price": 29.99},
         }
         self.products = products
+
+    @tool()
+    def list_products(self) -> dict:
+        """List all products."""
+        return self.products
 
     @tool()
     def get_product_info(self, product_id: int) -> dict:
@@ -70,8 +76,14 @@ mcp = FastMCP(
         prod.get_product_info,
         prod.update_price,
         prod.apply_discount,
+        prod.list_products,
     ],
 )
 
 if __name__ == "__main__":
-    mcp.run(transport="http", port=8181)
+    transport = os.getenv("MCP_TRANSPORT", "stdio")
+    if transport == "http":
+        port = int(os.getenv("MCP_PORT", "8181"))
+        mcp.run(transport="http", port=port)
+    else:
+        mcp.run(transport="stdio")

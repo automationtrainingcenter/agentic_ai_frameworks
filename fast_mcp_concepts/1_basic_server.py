@@ -1,4 +1,5 @@
 from fastmcp import FastMCP
+import os
 
 app = FastMCP("First MCP Server")
 
@@ -10,4 +11,9 @@ def greet(name: str) -> str:
 
 
 if __name__ == "__main__":
-    app.run(transport="http", port=8181)
+    transport = os.getenv("MCP_TRANSPORT", "stdio")
+    if transport == "http":
+        port = int(os.getenv("MCP_PORT", "8181"))
+        app.run(transport="http", port=port)
+    else:
+        app.run(transport="stdio")
